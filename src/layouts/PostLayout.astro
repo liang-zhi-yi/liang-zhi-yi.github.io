@@ -11,8 +11,10 @@ export interface Props {
   updatedDate?: Date;
   tags?: string[];
   cover?: string;
+  prevPost?: { id: string; data: { title: string } } | null;
+  nextPost?: { id: string; data: { title: string } } | null;
 }
-const { title, description, pubDate, updatedDate, tags = [], cover } = Astro.props;
+const { title, description, pubDate, updatedDate, tags = [], cover, prevPost, nextPost } = Astro.props;
 ---
 <BaseLayout title={`${title} | 小羊草地`} description={description} type="article" image={cover}>
   <ReadingProgress />
@@ -56,6 +58,36 @@ const { title, description, pubDate, updatedDate, tags = [], cover } = Astro.pro
       </div>
       <PostToc />
     </div>
+
+    <!-- 文章导航：返回和翻篇 -->
+    <nav class="post-navigation" aria-label="文章导航">
+      <div class="nav-back">
+        <a href="/blog/" class="nav-btn nav-back-btn">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+          <span>返回列表</span>
+        </a>
+      </div>
+      <div class="nav-prev-next">
+        {prevPost && (
+          <a href={`/blog/${prevPost.id.replace(/\.(md|mdx)$/, '')}/`} class="nav-btn nav-prev">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            <div class="nav-text">
+              <small>上一篇</small>
+              <span>{prevPost.data.title}</span>
+            </div>
+          </a>
+        )}
+        {nextPost && (
+          <a href={`/blog/${nextPost.id.replace(/\.(md|mdx)$/, '')}/`} class="nav-btn nav-next">
+            <div class="nav-text">
+              <small>下一篇</small>
+              <span>{nextPost.data.title}</span>
+            </div>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        )}
+      </div>
+    </nav>
   </article>
 </BaseLayout>
 
@@ -434,6 +466,149 @@ const { title, description, pubDate, updatedDate, tags = [], cover } = Astro.pro
     background: rgba(255, 224, 138, .1);
   }
 
+  /* ===== 文章导航 ===== */
+  .post-navigation {
+    width: min(760px, 90vw);
+    margin: 2.5rem auto 0;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .nav-back {
+    display: flex;
+    justify-content: center;
+  }
+
+  .nav-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .6rem 1.2rem;
+    border: 1px solid rgba(247, 201, 72, .4);
+    border-radius: var(--radius-lg);
+    background: rgba(255, 253, 245, .9);
+    color: var(--color-caramel);
+    font-size: .9rem;
+    font-weight: 850;
+    text-decoration: none;
+    transition: all 200ms ease;
+  }
+
+  .nav-back-btn:hover {
+    background: rgba(255, 232, 163, .5);
+    border-color: rgba(247, 201, 72, .7);
+    transform: translateY(-2px);
+  }
+
+  .nav-back-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  :root[data-theme='dark'] .nav-back-btn {
+    background: rgba(12, 12, 12, .8);
+    border-color: rgba(255, 224, 138, .25);
+  }
+
+  :root[data-theme='dark'] .nav-back-btn:hover {
+    background: rgba(255, 224, 138, .1);
+    border-color: rgba(255, 224, 138, .4);
+  }
+
+  .nav-prev-next {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .nav-btn {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid rgba(247, 201, 72, .3);
+    border-radius: var(--radius-xl);
+    background: rgba(255, 253, 245, .85);
+    color: var(--text-main);
+    text-decoration: none;
+    transition: all 200ms ease;
+  }
+
+  .nav-btn:hover {
+    background: rgba(255, 232, 163, .4);
+    border-color: rgba(247, 201, 72, .6);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(138, 106, 63, .1);
+  }
+
+  .nav-btn svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .nav-text {
+    display: grid;
+    gap: .15rem;
+    min-width: 0;
+  }
+
+  .nav-text small {
+    color: var(--text-muted);
+    font-size: .7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+
+  .nav-text span {
+    font-size: .85rem;
+    font-weight: 900;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nav-prev {
+    justify-content: flex-start;
+  }
+
+  .nav-next {
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  :root[data-theme='dark'] .nav-btn {
+    background: rgba(12, 12, 12, .75);
+    border-color: rgba(255, 224, 138, .2);
+  }
+
+  :root[data-theme='dark'] .nav-btn:hover {
+    background: rgba(255, 224, 138, .1);
+    border-color: rgba(255, 224, 138, .35);
+  }
+
+  @media (max-width: 600px) {
+    .nav-prev-next {
+      grid-template-columns: 1fr;
+    }
+
+    .nav-text span {
+      font-size: .8rem;
+    }
+  }
+
   /* 响应式调整 */
   @media (max-width: 760px) {
     .post-shell { width: 100%; padding-top: 24px; }
@@ -474,6 +649,10 @@ const { title, description, pubDate, updatedDate, tags = [], cover } = Astro.pro
     .post-content :global(h3) {
       font-size: 1.05rem;
       margin: 1.75em 0 .75em;
+    }
+
+    .post-navigation {
+      width: calc(100% - 24px);
     }
   }
 </style>

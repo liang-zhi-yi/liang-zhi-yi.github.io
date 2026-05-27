@@ -59,25 +59,28 @@ const isCurrent = (href: string) => current === href || (href !== '/' && current
     width: min(1120px, 100%);
     min-height: 82px;
     padding: 7px 10px 8px;
-    border: 1px solid rgba(31, 27, 22, .1);
+    border: 2px solid rgba(31, 27, 22, .25);
     border-radius: 0 0 30px 30px;
-    background: rgba(255, 253, 245, .58);
-    box-shadow: 0 18px 54px rgba(31,27,22,.12);
-    backdrop-filter: blur(20px) saturate(155%);
+    background: transparent;
+    box-shadow: 0 4px 20px rgba(31,27,22,.08);
     font-family: 'Baloo 2', 'Nunito', 'Arial Rounded MT Bold', 'Noto Sans SC', sans-serif;
     transition: transform .3s var(--ease-soft), background .3s ease, box-shadow .3s ease, min-height .3s var(--ease-soft);
   }
 
   :root[data-theme='dark'] .site-header {
-    background: rgba(49,37,29,.48);
-    border-color: rgba(255, 211, 106, .28);
+    background: transparent;
+    border-color: rgba(255, 211, 106, .45);
   }
 
   .site-header.is-scrolled {
     min-height: 74px;
-    background: rgba(255,253,245,.62);
-    box-shadow: 0 20px 58px rgba(95,75,50,.2);
+    background: rgba(255,253,245,.85);
+    box-shadow: 0 12px 40px rgba(95,75,50,.15);
     transform: translateX(-50%) translateY(2px);
+  }
+
+  :root[data-theme='dark'] .site-header.is-scrolled {
+    background: rgba(49,37,29,.75);
   }
 
   .header-inner {

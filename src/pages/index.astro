@@ -11,6 +11,12 @@ const [blogPosts, lifeEntries, projects, collections] = await Promise.all([
   getCollection('collections')
 ]);
 
+// 按日期排序各集合
+const sortedBlogPosts = blogPosts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+const sortedLifeEntries = lifeEntries.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+const sortedProjects = projects.sort((a, b) => (b.data.pubDate?.getTime() || 0) - (a.data.pubDate?.getTime() || 0));
+const sortedCollections = collections.sort((a, b) => (b.data.pubDate?.getTime() || 0) - (a.data.pubDate?.getTime() || 0));
+
 const siteStats = [
   ['Notes', blogPosts.length],
   ['Life', lifeEntries.length],
@@ -19,7 +25,7 @@ const siteStats = [
 ];
 
 const timelineItems = [
-  ...blogPosts.map((post) => ({
+  ...sortedBlogPosts.map((post) => ({
     title: post.data.title,
     description: post.data.description,
     date: post.data.pubDate,
@@ -29,7 +35,7 @@ const timelineItems = [
     tone: 'honey',
     meta: post.data.category || '技术'
   })),
-  ...lifeEntries.map((entry) => ({
+  ...sortedLifeEntries.map((entry) => ({
     title: entry.data.title,
     description: entry.data.description || '生活片段',
     date: entry.data.pubDate,
@@ -39,20 +45,20 @@ const timelineItems = [
     tone: 'pink',
     meta: entry.data.mood || '日常'
   })),
-  ...projects.map((project) => ({
+  ...sortedProjects.map((project) => ({
     title: project.data.title,
     description: project.data.description,
-    date: project.data.pubDate,
+    date: project.data.pubDate || new Date('2026-01-01'),
     href: project.data.demoUrl || project.data.repoUrl || '/projects/',
     type: '作品展示',
     mark: 'Work',
     tone: 'grass',
     meta: project.data.status
   })),
-  ...collections.map((item) => ({
+  ...sortedCollections.map((item) => ({
     title: item.data.title,
     description: item.data.description || '收藏条目',
-    date: new Date('2026-05-27'),
+    date: item.data.pubDate || new Date('2026-01-01'),
     href: item.data.link || '/collections/',
     type: '兴趣收藏',
     mark: 'Pin',

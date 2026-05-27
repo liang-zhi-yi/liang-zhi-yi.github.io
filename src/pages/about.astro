@@ -667,7 +667,11 @@ const latestUpdate = allDates.length > 0 ? new Date(Math.max(...allDates.map(d =
     font-size: 12px;
     font-weight: 850;
     cursor: pointer;
-    transition: all 180ms ease;
+    transition:
+      background 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease,
+      transform 180ms ease;
   }
 
   .copy-btn svg {

@@ -211,7 +211,12 @@ const { title, description, pubDate, updatedDate, tags = [], cover, prevPost, ne
     font-size: .95rem;
     font-weight: 850;
     cursor: pointer;
-    transition: all 200ms ease;
+    transition:
+      background 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease,
+      box-shadow 200ms ease,
+      transform 200ms ease;
   }
 
   .toc-toggle-mobile svg {
@@ -429,7 +434,7 @@ const { title, description, pubDate, updatedDate, tags = [], cover, prevPost, ne
     text-decoration: underline;
     text-decoration-color: rgba(182, 120, 36, .3);
     text-underline-offset: .2em;
-    transition: all 180ms ease;
+    transition: color 180ms ease, text-decoration-color 180ms ease;
   }
 
   .post-content :global(a:hover) {
@@ -535,7 +540,11 @@ const { title, description, pubDate, updatedDate, tags = [], cover, prevPost, ne
     background: rgba(255, 253, 245, .85);
     color: var(--text-main);
     text-decoration: none;
-    transition: all 200ms ease;
+    transition:
+      background 200ms ease,
+      border-color 200ms ease,
+      box-shadow 200ms ease,
+      transform 200ms ease;
   }
 
   .nav-btn:hover {

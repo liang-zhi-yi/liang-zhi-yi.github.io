@@ -12,8 +12,9 @@ const {
   image = '/images/covers/default-post-cover.svg',
   type = 'website'
 } = Astro.props;
-const canonical = new URL(Astro.url.pathname, Astro.site || 'https://example.com').toString();
-const imageUrl = image?.startsWith('http') ? image : new URL(image, Astro.site || 'https://example.com').toString();
+const siteUrl = Astro.site || 'https://liang-zhi-yi.github.io';
+const canonical = new URL(Astro.url.pathname, siteUrl).toString();
+const imageUrl = image?.startsWith('http') ? image : new URL(image, siteUrl).toString();
 ---
 <title>{title}</title>
 <meta name="description" content={description} />

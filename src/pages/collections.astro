@@ -3,6 +3,8 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 
 const items = await getCollection('collections');
+const toTime = (date?: Date) => date?.getTime() || 0;
+const withContentTime = <T extends { data: { pubDate?: Date; updatedDate?: Date } }>(item: T) => Math.max(toTime(item.data.updatedDate), toTime(item.data.pubDate));
 const categories = [
   { key: 'all', label: '全部' },
   { key: 'tool', label: '工具' },
@@ -25,7 +27,7 @@ const typeLabels: Record<string, string> = {
   tech: '技术'
 };
 const normalizedType = (type: string) => ['book', 'anime', 'game', 'tool', 'website', 'sport', 'tech'].includes(type) ? type : (type === 'music' ? 'tool' : 'tech');
-const sortedItems = [...items].sort((a, b) => (b.data.rating || 0) - (a.data.rating || 0));
+const sortedItems = [...items].sort((a, b) => withContentTime(b) - withContentTime(a));
 ---
 <BaseLayout title="Interest & Collections | 小羊草地" description="收藏喜欢的工具、网站、书籍、动漫、运动、游戏和技术内容。">
   <main class="collections-shell">

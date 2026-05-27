@@ -3,8 +3,10 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { formatDate } from '../utils/date';
 
+const toTime = (date?: Date) => date?.getTime() || 0;
+const withContentTime = <T extends { data: { pubDate?: Date; updatedDate?: Date } }>(item: T) => Math.max(toTime(item.data.updatedDate), toTime(item.data.pubDate));
 const projects = (await getCollection('projects'))
-  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+  .sort((a, b) => withContentTime(b) - withContentTime(a));
 const statusText = {
   idea: '点子孵化',
   building: '正在搭建',
@@ -21,7 +23,7 @@ const statusSummary = projects.reduce<Record<string, number>>((summary, project)
   summary[status] = (summary[status] || 0) + 1;
   return summary;
 }, {});
-const latestProject = projects[0]?.data.pubDate;
+const latestProject = projects[0] ? new Date(withContentTime(projects[0])) : undefined;
 ---
 <BaseLayout title="Works Showcase | 小羊草地" description="以 Bento Grid 展示正在构建和已经完成的前端、内容与设计项目。">
   <main class="works-shell">

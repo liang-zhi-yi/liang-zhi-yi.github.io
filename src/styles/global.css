@@ -10,6 +10,11 @@ html {
     url('/images/backgrounds/blog-reference-bg.png') center / cover fixed no-repeat,
     linear-gradient(135deg, var(--color-cream-bg), var(--color-sheep-wool));
   overflow-x: hidden;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
 }
 
 body {
@@ -152,6 +157,17 @@ img { max-width: 100%; height: auto; display: block; }
 button, input, textarea, select { font: inherit; }
 
 button { cursor: pointer; }
+
+:where(a, button, [role='button'], input, textarea, select, summary):focus-visible {
+  outline: 3px solid rgba(247, 201, 72, .72);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(255, 232, 163, .32);
+}
+
+:root[data-theme='dark'] :where(a, button, [role='button'], input, textarea, select, summary):focus-visible {
+  outline-color: rgba(255, 224, 138, .72);
+  box-shadow: 0 0 0 5px rgba(255, 224, 138, .16);
+}
 
 .container {
   width: min(var(--content-width), calc(100% - 32px));

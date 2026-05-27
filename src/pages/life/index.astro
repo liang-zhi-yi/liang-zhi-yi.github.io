@@ -3,11 +3,13 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { formatDate } from '../../utils/date';
 
+const toTime = (date?: Date) => date?.getTime() || 0;
+const withContentTime = <T extends { data: { pubDate?: Date; updatedDate?: Date } }>(item: T) => Math.max(toTime(item.data.updatedDate), toTime(item.data.pubDate));
 const lifeEntries = (await getCollection('life', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+  .sort((a, b) => withContentTime(b) - withContentTime(a));
 
 const moods = Array.from(new Set(lifeEntries.map((entry) => entry.data.mood).filter(Boolean)));
-const latestLife = lifeEntries[0]?.data.pubDate;
+const latestLife = lifeEntries[0] ? new Date(withContentTime(lifeEntries[0])) : undefined;
 const lifeHref = (id: string) => `/life/${id.replace(/\.(md|mdx)$/, '')}/`;
 const weatherList = ['晴 / Sunlit', '多云 / Cloudy', '微风 / Breeze', '午后光 / Warm light'];
 const photoTones = ['photo-peach', 'photo-sky', 'photo-grass', 'photo-honey'];

@@ -4,8 +4,10 @@ import PostLayout from '../../layouts/PostLayout.astro';
 
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
-  // 按日期排序
-  const sortedPosts = posts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+  const toTime = (date?: Date) => date?.getTime() || 0;
+  const withContentTime = <T extends { data: { pubDate?: Date; updatedDate?: Date } }>(item: T) => Math.max(toTime(item.data.updatedDate), toTime(item.data.pubDate));
+  // 按更新/上传时间排序，保持详情页上一篇/下一篇与列表一致
+  const sortedPosts = posts.sort((a, b) => withContentTime(b) - withContentTime(a));
   
   return sortedPosts.map((post, index) => {
     const prevPost = index < sortedPosts.length - 1 ? sortedPosts[index + 1] : null;

@@ -3,8 +3,10 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { formatDate } from '../../utils/date';
 
+const toTime = (date?: Date) => date?.getTime() || 0;
+const withContentTime = <T extends { data: { pubDate?: Date; updatedDate?: Date } }>(item: T) => Math.max(toTime(item.data.updatedDate), toTime(item.data.pubDate));
 const posts = (await getCollection('blog', ({ data }) => !data.draft))
-  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+  .sort((a, b) => withContentTime(b) - withContentTime(a));
 
 const categories = Array.from(new Set(posts.map((post) => post.data.category)));
 const allTags = Array.from(new Set(posts.flatMap((post) => post.data.tags))).slice(0, 16);

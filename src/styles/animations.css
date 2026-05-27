@@ -29,6 +29,26 @@
   transform: translateY(0);
 }
 
+/* 确保内容在JS未执行或失败时也能显示 */
+@media (scripting: none) {
+  .reveal-on-scroll {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* 2秒后强制显示内容，防止JS动画失败导致内容不可见 */
+.reveal-on-scroll {
+  animation: force-reveal 0.01s 2s forwards;
+}
+
+@keyframes force-reveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .float-soft {
   animation: float-sheep 4.8s ease-in-out infinite;
 }

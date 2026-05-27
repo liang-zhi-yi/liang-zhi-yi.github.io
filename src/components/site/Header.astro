@@ -59,33 +59,37 @@ const isCurrent = (href: string) => current === href || (href !== '/' && current
     width: min(1120px, 100%);
     min-height: 82px;
     padding: 7px 10px 8px;
-    border: 2px solid rgba(31, 27, 22, .34);
-    outline: 1px solid rgba(255, 253, 245, .78);
+    border: 2px solid rgba(255, 232, 163, .92);
+    outline: 1px solid rgba(247, 201, 72, .44);
     outline-offset: -5px;
     border-radius: 0 0 30px 30px;
-    background: transparent;
-    box-shadow: 0 4px 20px rgba(31,27,22,.08);
+    background:
+      linear-gradient(135deg, rgba(255, 253, 245, .62), rgba(255, 232, 163, .48) 58%, rgba(247, 201, 72, .22));
+    box-shadow: 0 12px 32px rgba(201,139,58,.18), inset 0 0 0 1px rgba(255,253,245,.52);
     font-family: 'Baloo 2', 'Nunito', 'Arial Rounded MT Bold', 'Noto Sans SC', sans-serif;
-    transition: transform .3s var(--ease-soft), border-color .3s ease, box-shadow .3s ease, min-height .3s var(--ease-soft);
+    transition: transform .3s var(--ease-soft), background .3s ease, border-color .3s ease, box-shadow .3s ease, min-height .3s var(--ease-soft);
   }
 
   :root[data-theme='dark'] .site-header {
-    background: transparent;
-    border-color: rgba(255, 211, 106, .58);
-    outline-color: rgba(12, 12, 12, .64);
+    background:
+      linear-gradient(135deg, rgba(49, 37, 29, .68), rgba(255, 211, 106, .2));
+    border-color: rgba(255, 211, 106, .66);
+    outline-color: rgba(255, 224, 138, .24);
   }
 
   .site-header.is-scrolled {
     min-height: 74px;
-    background: transparent;
-    border-color: rgba(31, 27, 22, .42);
-    box-shadow: 0 12px 34px rgba(95,75,50,.12);
+    background:
+      linear-gradient(135deg, rgba(255, 253, 245, .72), rgba(255, 232, 163, .54) 58%, rgba(247, 201, 72, .26));
+    border-color: rgba(255, 232, 163, .98);
+    box-shadow: 0 14px 34px rgba(201,139,58,.22), inset 0 0 0 1px rgba(255,253,245,.6);
     transform: translateX(-50%) translateY(2px);
   }
 
   :root[data-theme='dark'] .site-header.is-scrolled {
-    background: transparent;
-    border-color: rgba(255, 211, 106, .62);
+    background:
+      linear-gradient(135deg, rgba(49, 37, 29, .76), rgba(255, 211, 106, .24));
+    border-color: rgba(255, 211, 106, .74);
   }
 
   .header-inner {
@@ -95,9 +99,9 @@ const isCurrent = (href: string) => current === href || (href !== '/' && current
     gap: .75rem;
     min-width: 0;
     padding: .58rem .72rem;
-    border: 1px solid rgba(31, 27, 22, .18);
+    border: 1px solid rgba(255, 232, 163, .78);
     border-radius: 26px;
-    background: transparent;
+    background: rgba(255, 253, 245, .28);
   }
 
   .brand {
@@ -158,9 +162,9 @@ const isCurrent = (href: string) => current === href || (href !== '/' && current
     min-width: 0;
     min-height: 31px;
     padding: .3rem .58rem;
-    border: 1px solid rgba(31, 27, 22, .2);
+    border: 1px solid rgba(255, 232, 163, .76);
     border-radius: 22px;
-    background: transparent;
+    background: rgba(255, 253, 245, .36);
     color: var(--text-main);
     overflow: hidden;
     text-align: left;
@@ -213,9 +217,9 @@ const isCurrent = (href: string) => current === href || (href !== '/' && current
   }
 
   :root[data-theme='dark'] .nav-link {
-    background: transparent;
+    background: rgba(49, 37, 29, .42);
     color: #ffffff;
-    border-color: rgba(255,255,255,.28);
+    border-color: rgba(255, 224, 138, .38);
   }
 
   :root[data-theme='dark'] .nav-meta,
@@ -268,6 +272,7 @@ const isCurrent = (href: string) => current === href || (href !== '/' && current
     .header-inner {
       padding: 0;
       background: transparent;
+      border-color: transparent;
       border-radius: var(--radius-pill);
     }
 
@@ -281,11 +286,11 @@ const isCurrent = (href: string) => current === href || (href !== '/' && current
       display: none;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       padding: 12px;
-      border: 1px solid rgba(31, 27, 22, .28);
+      border: 1px solid rgba(255, 232, 163, .86);
       border-radius: var(--radius-lg);
-      background: transparent;
-      box-shadow: var(--shadow-card);
-      backdrop-filter: blur(18px);
+      background: linear-gradient(135deg, rgba(255, 253, 245, .78), rgba(255, 232, 163, .56));
+      box-shadow: var(--shadow-card), inset 0 0 0 1px rgba(255,253,245,.42);
+      backdrop-filter: none;
     }
 
     .site-nav.open { display: grid; animation: soft-pop .22s var(--ease-soft); }
@@ -293,7 +298,7 @@ const isCurrent = (href: string) => current === href || (href !== '/' && current
     .nav-link {
       color: var(--text-main);
       text-shadow: none;
-      background: transparent;
+      background: rgba(255,253,245,.38);
     }
 
     .nav-meta,

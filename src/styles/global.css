@@ -5,11 +5,16 @@
 
 html {
   scroll-behavior: smooth;
-  background: var(--color-cream-bg);
+  background:
+    linear-gradient(180deg, rgba(255, 248, 220, .34), rgba(255, 250, 240, .24)),
+    url('/images/backgrounds/blog-reference-bg.png') center / cover fixed no-repeat,
+    linear-gradient(135deg, var(--color-cream-bg), var(--color-sheep-wool));
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
+  min-width: 100%;
   min-height: 100vh;
   padding-top: 104px;
   color: var(--text-main);
@@ -22,7 +27,8 @@ body {
   overflow-x: hidden;
 }
 
-:root[data-theme='dark'] body {
+:root[data-theme='dark'] body,
+:root[data-theme='dark'] html {
   background:
     linear-gradient(180deg, rgba(0, 0, 0, .5), rgba(0, 0, 0, .76)),
     url('/images/backgrounds/dark-reference-bg.png') center / cover fixed no-repeat,
@@ -96,6 +102,24 @@ body::after {
 }
 
 @media (max-width: 980px) {
+  body,
+  html {
+    background-attachment: scroll, scroll, scroll;
+    background-position: center top, center top, center top;
+    background-size: auto, max(100vw, 100%) auto, auto;
+  }
+
+  body {
+    position: relative;
+    min-width: 100%;
+  }
+
+  body::before {
+    background:
+      linear-gradient(90deg, rgba(255, 248, 220, .08), rgba(255, 250, 240, .36) 18%, rgba(255, 250, 240, .5) 50%, rgba(255, 250, 240, .36) 82%, rgba(255, 248, 220, .08)),
+      radial-gradient(circle at 50% 34%, rgba(255, 255, 255, .1), transparent 22rem);
+  }
+
   #main-content { width: 100%; }
   #main-content::before,
   #main-content::after { display: none; }

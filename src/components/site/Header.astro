@@ -59,28 +59,33 @@ const isCurrent = (href: string) => current === href || (href !== '/' && current
     width: min(1120px, 100%);
     min-height: 82px;
     padding: 7px 10px 8px;
-    border: 2px solid rgba(31, 27, 22, .25);
+    border: 2px solid rgba(31, 27, 22, .34);
+    outline: 1px solid rgba(255, 253, 245, .78);
+    outline-offset: -5px;
     border-radius: 0 0 30px 30px;
     background: transparent;
     box-shadow: 0 4px 20px rgba(31,27,22,.08);
     font-family: 'Baloo 2', 'Nunito', 'Arial Rounded MT Bold', 'Noto Sans SC', sans-serif;
-    transition: transform .3s var(--ease-soft), background .3s ease, box-shadow .3s ease, min-height .3s var(--ease-soft);
+    transition: transform .3s var(--ease-soft), border-color .3s ease, box-shadow .3s ease, min-height .3s var(--ease-soft);
   }
 
   :root[data-theme='dark'] .site-header {
     background: transparent;
-    border-color: rgba(255, 211, 106, .45);
+    border-color: rgba(255, 211, 106, .58);
+    outline-color: rgba(12, 12, 12, .64);
   }
 
   .site-header.is-scrolled {
     min-height: 74px;
-    background: rgba(255,253,245,.85);
-    box-shadow: 0 12px 40px rgba(95,75,50,.15);
+    background: transparent;
+    border-color: rgba(31, 27, 22, .42);
+    box-shadow: 0 12px 34px rgba(95,75,50,.12);
     transform: translateX(-50%) translateY(2px);
   }
 
   :root[data-theme='dark'] .site-header.is-scrolled {
-    background: rgba(49,37,29,.75);
+    background: transparent;
+    border-color: rgba(255, 211, 106, .62);
   }
 
   .header-inner {
@@ -90,8 +95,9 @@ const isCurrent = (href: string) => current === href || (href !== '/' && current
     gap: .75rem;
     min-width: 0;
     padding: .58rem .72rem;
+    border: 1px solid rgba(31, 27, 22, .18);
     border-radius: 26px;
-    background: linear-gradient(145deg, rgba(255,253,245,.32), rgba(255,232,163,.14));
+    background: transparent;
   }
 
   .brand {
@@ -152,9 +158,9 @@ const isCurrent = (href: string) => current === href || (href !== '/' && current
     min-width: 0;
     min-height: 31px;
     padding: .3rem .58rem;
-    border: 1px solid rgba(255,255,255,.46);
+    border: 1px solid rgba(31, 27, 22, .2);
     border-radius: 22px;
-    background: linear-gradient(145deg, rgba(255,253,245,.64), rgba(255,232,163,.18));
+    background: transparent;
     color: var(--text-main);
     overflow: hidden;
     text-align: left;
@@ -207,9 +213,9 @@ const isCurrent = (href: string) => current === href || (href !== '/' && current
   }
 
   :root[data-theme='dark'] .nav-link {
-    background: rgba(0,0,0,.44);
+    background: transparent;
     color: #ffffff;
-    border-color: rgba(255,255,255,.18);
+    border-color: rgba(255,255,255,.28);
   }
 
   :root[data-theme='dark'] .nav-meta,
@@ -275,9 +281,9 @@ const isCurrent = (href: string) => current === href || (href !== '/' && current
       display: none;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       padding: 12px;
-      border: 1px solid rgba(255,255,255,.72);
+      border: 1px solid rgba(31, 27, 22, .28);
       border-radius: var(--radius-lg);
-      background: rgba(255,253,245,.88);
+      background: transparent;
       box-shadow: var(--shadow-card);
       backdrop-filter: blur(18px);
     }
@@ -287,7 +293,7 @@ const isCurrent = (href: string) => current === href || (href !== '/' && current
     .nav-link {
       color: var(--text-main);
       text-shadow: none;
-      background: rgba(255,232,163,.26);
+      background: transparent;
     }
 
     .nav-meta,

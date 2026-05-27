@@ -50,6 +50,8 @@ const collectionItems = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
+    pubDate: z.coerce.date().optional(),
+    updatedDate: z.coerce.date().optional(),
     type: z.enum(['book', 'anime', 'game', 'tool', 'website', 'music', 'other']),
     rating: z.number().min(1).max(5).optional(),
     tags: z.array(z.string()).default([]),

@@ -62,7 +62,7 @@
         marker.style.transform = `translateY(${Math.max(0, center - 6)}px)`;
       };
 
-      const setActive = (id, shouldScrollToc = true) => {
+      const setActive = (id, shouldScrollToc = false) => {
         const activeLink = links.find((link) => link.dataset.targetId === id) || links[0];
         if (!activeLink) return;
         activeId = activeLink.dataset.targetId || id;
@@ -76,7 +76,10 @@
         moveMarkerTo(activeLink);
 
         if (shouldScrollToc) {
-          activeLink.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+          const linkTop = activeLink.offsetTop;
+          const linkHeight = activeLink.offsetHeight;
+          const targetTop = Math.max(0, linkTop - tocScroll.clientHeight / 2 + linkHeight / 2);
+          tocScroll.scrollTo({ top: targetTop, behavior: reduceMotion ? 'auto' : 'smooth' });
         }
       };
 
@@ -103,7 +106,7 @@
       const syncByScroll = () => {
         ticking = false;
         const id = getCurrentHeadingId();
-        if (id && id !== activeId) setActive(id);
+        if (id && id !== activeId) setActive(id, false);
         else {
           const activeLink = links.find((link) => link.dataset.targetId === activeId);
           if (activeLink) moveMarkerTo(activeLink);
@@ -125,7 +128,7 @@
 
           // 阻止默认行为，使用平滑滚动
           event.preventDefault();
-          setActive(id);
+          setActive(id, true);
           target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
           history.replaceState(null, '', `#${id}`);
         });

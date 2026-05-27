@@ -1,0 +1,8 @@
+<button class="back-to-top" type="button" aria-label="回到顶部" tabindex="-1" aria-hidden="true" data-back-to-top>
+  <span aria-hidden="true">↑</span>
+</button>
+
+<style>
+  .back-to-top { position: fixed; right: 18px; top: 152px; z-index: 40; width: 44px; height: 44px; border: 2px solid var(--border-soft); border-radius: 50%; background: var(--color-butter); color: var(--text-main); box-shadow: var(--shadow-card); font-weight: 900; opacity: 0; pointer-events: none; transform: translateX(10px); transition: opacity .25s ease, transform .25s var(--ease-soft); }
+  .back-to-top.show { opacity: 1; pointer-events: auto; transform: translateX(0); }
+</style>

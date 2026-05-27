@@ -1,0 +1,21 @@
+---
+export interface Props { title: string; description?: string; type: string; rating?: number; href?: string; }
+const { title, description, type, rating, href } = Astro.props;
+const cardHref = href || '/collections/';
+const typeLabel = { book: '书架', anime: '番剧', game: '游戏', tool: '工具', website: '网站', music: '音乐', other: '杂物盒' }[type] || type;
+---
+<a class="collection-card soft-card reveal-on-scroll" href={cardHref}>
+  <span class="pin" aria-hidden="true"></span>
+  <strong>{typeLabel}</strong>
+  <h3>{title}</h3>
+  {description && <p>{description}</p>}
+  {rating && <div class="rating" aria-label={`评分 ${rating} 星`}>{'★'.repeat(rating)}</div>}
+</a>
+<style>
+  .collection-card { display: block; min-height: 190px; padding: 1.2rem; transform: rotate(-.6deg); }
+  .collection-card:nth-child(even) { transform: rotate(.7deg); }
+  .collection-card:hover { transform: translateY(-6px) rotate(0); }
+  .pin { width: 14px; height: 14px; border-radius: 50%; background: var(--color-pink-soft); box-shadow: inset 0 -2px 0 rgba(0,0,0,.08); display: inline-block; }
+  strong { margin-left: .4rem; color: var(--text-muted); } h3 { margin: .65rem 0 .35rem; } p { color: var(--text-muted); }
+  .rating { color: var(--color-honey); letter-spacing: .08em; }
+</style>

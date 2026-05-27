@@ -1,0 +1,18 @@
+---
+import { formatDate } from '../../utils/date';
+
+export interface Props { href?: string; title: string; description?: string; mood?: string; date?: Date; }
+const { href, title, description, mood, date } = Astro.props;
+const cardHref = href || '/life/';
+---
+<a class="life-card soft-card reveal-on-scroll" href={cardHref}>
+  <span class="mood">{mood || '软乎乎的一天'}</span>
+  <h3>{title}</h3>
+  {description && <p>{description}</p>}
+  {date && <time datetime={date.toISOString()}>{formatDate(date)}</time>}
+</a>
+<style>
+  .life-card { display: block; padding: 1.2rem; min-height: 190px; }
+  .mood { display: inline-flex; padding: .28rem .62rem; border-radius: var(--radius-pill); background: rgba(255,214,223,.55); font-weight: 900; color: var(--text-main); }
+  h3 { margin: .9rem 0 .45rem; } p, time { color: var(--text-muted); } time { font-weight: 800; font-size: .9rem; }
+</style>

@@ -1,0 +1,90 @@
+---
+import SEO from '../components/site/SEO.astro';
+import Header from '../components/site/Header.astro';
+import Footer from '../components/site/Footer.astro';
+import ThemeToggle from '../components/site/ThemeToggle.astro';
+import BackToTop from '../components/site/BackToTop.astro';
+import '../styles/global.css';
+
+export interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+}
+const { title, description, image, type = 'website' } = Astro.props;
+---
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ffe8a3" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@800;900&display=swap" rel="stylesheet" />
+    <link rel="icon" href="/favicon.svg" />
+    <script is:inline>
+      (() => {
+        const saved = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.dataset.theme = saved || (prefersDark ? 'dark' : 'light');
+      })();
+    </script>
+    <SEO title={title} description={description} image={image} type={type} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">跳到主要内容</a>
+    <Header />
+    <div id="main-content" tabindex="-1">
+      <slot />
+    </div>
+    <Footer />
+    <ThemeToggle />
+    <BackToTop />
+    <canvas id="cursor-trail" aria-hidden="true"></canvas>
+    <script type="module" src="/src/scripts/site.ts"></script>
+    <script is:inline>
+      (() => {
+        if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
+        const canvas = document.getElementById('cursor-trail');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        const dpr = window.devicePixelRatio || 1;
+        let W, H;
+        const resize = () => { W = window.innerWidth; H = window.innerHeight; canvas.width = W * dpr; canvas.height = H * dpr; canvas.style.width = W + 'px'; canvas.style.height = H + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0); };
+        resize();
+        window.addEventListener('resize', resize);
+        const TRAIL_LEN = 15;
+        const points = [];
+        for (let i = 0; i < TRAIL_LEN; i++) points.push({ x: -100, y: -100 });
+        let mouseX = -100, mouseY = -100;
+        document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+        const colors = ['#ffc87c', '#f9d59b', '#ffe8a3', '#ffd6a5'];
+        const draw = () => {
+          ctx.clearRect(0, 0, W, H);
+          points[0].x += (mouseX - points[0].x) * 0.35;
+          points[0].y += (mouseY - points[0].y) * 0.35;
+          for (let i = 1; i < TRAIL_LEN; i++) {
+            points[i].x += (points[i - 1].x - points[i].x) * 0.25;
+            points[i].y += (points[i - 1].y - points[i].y) * 0.25;
+          }
+          for (let i = TRAIL_LEN - 1; i >= 0; i--) {
+            const t = 1 - i / TRAIL_LEN;
+            const r = Math.max(0.5, t * 4);
+            const alpha = t * 0.55;
+            ctx.beginPath();
+            ctx.arc(points[i].x, points[i].y, r, 0, Math.PI * 2);
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.globalAlpha = alpha;
+            ctx.fill();
+          }
+          ctx.globalAlpha = 1;
+          requestAnimationFrame(draw);
+        };
+        draw();
+      })();
+    </script>
+  </body>
+</html>

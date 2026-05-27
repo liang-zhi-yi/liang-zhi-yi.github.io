@@ -1,0 +1,19 @@
+---
+export interface Props {
+  title: string;
+  subtitle: string;
+  href: string;
+  hrefLabel?: string;
+}
+const { title, subtitle, href, hrefLabel = '查看更多' } = Astro.props;
+---
+<div class="section-heading">
+  <div>
+    <h2>{title}</h2>
+    <p>{subtitle}</p>
+  </div>
+  <a class="section-more" href={href}>{hrefLabel}</a>
+</div>
+<style>
+  .section-more { font-weight: 900; color: var(--color-caramel); }
+</style>

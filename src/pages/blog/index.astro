@@ -1,0 +1,205 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate } from '../../utils/date';
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+
+const categories = Array.from(new Set(posts.map((post) => post.data.category)));
+const allTags = Array.from(new Set(posts.flatMap((post) => post.data.tags))).slice(0, 16);
+const newestDate = posts[0]?.data.pubDate;
+const postHref = (id: string) => `/blog/${id.replace(/\.(md|mdx)$/, '')}/`;
+const slugify = (value: string) => encodeURIComponent(value.trim().toLowerCase().replace(/\s+/g, '-'));
+const categoryAnchor = (category: string) => `cat-${slugify(category)}`;
+const firstPostByCategory = new Set<string>();
+const readMinutes = (description = '', index = 0) => `${Math.max(3, Math.ceil(description.length / 38) + index)} min read`;
+const coverGradients = [
+  'cover-honey',
+  'cover-grass',
+  'cover-sky',
+  'cover-pink'
+];
+const imageModules = import.meta.glob('../../../image/*.{png,jpg,jpeg,webp}', { eager: true, query: '?url', import: 'default' });
+const imagePool = Object.values(imageModules) as string[];
+const articleImage = (index: number) => imagePool[index % imagePool.length] || '';
+---
+<BaseLayout title="Tech Articles | 小羊草地" description="以知识花园式双栏结构收纳 Astro、前端设计、内容管理和阅读体验相关的技术文章。">
+  <main class="tech-page">
+    <div class="tech-shell">
+      <section class="tech-hero reveal-on-scroll" aria-labelledby="tech-title">
+        <span class="sticker-tag">Tech Articles</span>
+        <h1 id="tech-title">技术笔记</h1>
+        <p>前端、Astro、项目复盘。</p>
+      </section>
+
+      <aside class="tech-info-board reveal-on-scroll" aria-label="技术文章信息看板">
+        <div class="board-copy">
+          <span>Article Index</span>
+          <strong>{posts.length} 篇技术笔记</strong>
+        </div>
+        <dl class="board-stats">
+          <div><dt>Notes</dt><dd>{posts.length}</dd></div>
+          <div><dt>Categories</dt><dd>{categories.length}</dd></div>
+          <div><dt>Tags</dt><dd>{allTags.length}</dd></div>
+          <div><dt>Latest</dt><dd>{newestDate ? formatDate(newestDate) : '等待'}</dd></div>
+        </dl>
+      </aside>
+
+      <div class="garden-layout">
+        <aside class="garden-sidebar" aria-label="技术文章目录栏">
+          <div class="sidebar-card soft-card reveal-on-scroll">
+            <span class="sidebar-label">Categories</span>
+            <nav class="category-nav" aria-label="分类导航">
+              {categories.map((category) => <a href={`#${categoryAnchor(category)}`}>{category}</a>)}
+            </nav>
+          </div>
+
+          {allTags.length > 0 && (
+            <div class="sidebar-card soft-card reveal-on-scroll">
+              <span class="sidebar-label">Tag Cloud</span>
+              <div class="tag-cloud">
+                {allTags.map((tag, index) => <span class={index % 3 === 0 ? 'tag-strong' : ''}>#{tag}</span>)}
+              </div>
+            </div>
+          )}
+
+          <div class="sidebar-card status-card soft-card reveal-on-scroll">
+            <span class="sidebar-label">Reading Status</span>
+            <dl>
+              <div><dt>Notes</dt><dd>{posts.length}</dd></div>
+              <div><dt>Latest</dt><dd>{newestDate ? formatDate(newestDate) : '等待播种'}</dd></div>
+              <div><dt>Mode</dt><dd>慢读 / 复盘 / 更新</dd></div>
+            </dl>
+          </div>
+
+          <div class="sidebar-card soft-card reveal-on-scroll">
+            <span class="sidebar-label">Series</span>
+            <ol class="series-list">
+              <li><strong>Astro Garden</strong><span>内容集合、路由和静态生成。</span></li>
+              <li><strong>Soft UI Notes</strong><span>奶油黄界面与阅读体验。</span></li>
+              <li><strong>Review Shelf</strong><span>项目复盘与可复用清单。</span></li>
+            </ol>
+          </div>
+        </aside>
+
+        <section class="article-stream" aria-label="中间主文章流">
+          {posts.map((post, index) => {
+            const isFirstInCategory = !firstPostByCategory.has(post.data.category);
+            if (isFirstInCategory) firstPostByCategory.add(post.data.category);
+            return (
+              <a
+                id={isFirstInCategory ? categoryAnchor(post.data.category) : undefined}
+                class="garden-article soft-card reveal-on-scroll"
+                href={postHref(post.id)}
+                aria-label={`阅读文章：${post.data.title}`}
+              >
+                <div class={`article-cover ${coverGradients[index % coverGradients.length]}`} aria-hidden="true">
+                  {articleImage(index) && <img src={articleImage(index)} alt="" loading="lazy" />}
+                  <span>{post.data.category}</span>
+                  <i>{String(index + 1).padStart(2, '0')}</i>
+                </div>
+                <div class="article-body">
+                  <div class="article-topline">
+                    <span>{post.data.category}</span>
+                    <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+                    <span>{readMinutes(post.data.description, index)}</span>
+                  </div>
+                  <h2>{post.data.title}</h2>
+                  <p>{post.data.description}</p>
+                  <div class="article-bottomline">
+                    <div class="article-tags">
+                      {post.data.tags.slice(0, 4).map((tag) => <span>#{tag}</span>)}
+                    </div>
+                    <span class="read-link">阅读笔记 →</span>
+                  </div>
+                </div>
+              </a>
+            );
+          })}
+        </section>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .tech-page { padding: clamp(30px, 5vw, 58px) 0 82px; }
+  .tech-shell { width: var(--page-shell-width); margin-inline: auto; }
+  .tech-hero { max-width: var(--page-core-width); margin: 0 auto 1rem; text-align: center; }
+  .tech-hero h1 { margin: .85rem 0 .75rem; font-size: clamp(1.22rem, 2.1vw, 2.2rem); line-height: 1.14; letter-spacing: -.028em; }
+  .tech-hero p { max-width: 680px; margin: 0 auto; color: var(--text-muted); font-size: clamp(.96rem, 1.2vw, 1.06rem); }
+
+  .tech-info-board {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: center;
+    margin: 0 auto clamp(1.2rem, 2.4vw, 1.8rem);
+    padding: .95rem 1rem;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-xl);
+    background: rgba(255,253,245,.88);
+    box-shadow: var(--shadow-card);
+    backdrop-filter: blur(14px) saturate(126%);
+  }
+
+  :root[data-theme='dark'] .tech-info-board { background: rgba(12,12,12,.78); }
+  .board-copy { display: grid; gap: .18rem; }
+  .board-copy span { color: var(--color-caramel); font-size: .72rem; font-weight: 950; letter-spacing: .16em; text-transform: uppercase; }
+  .board-copy strong { color: var(--text-main); font-size: clamp(1.05rem, 1.5vw, 1.32rem); line-height: 1.18; }
+  .board-copy p { margin: 0; color: var(--text-muted); font-size: .92rem; }
+  .board-stats { display: grid; grid-template-columns: repeat(4, minmax(62px, 1fr)); gap: .5rem; margin: 0; }
+  .board-stats div { padding: .55rem .65rem; border-radius: 18px; background: rgba(255,232,163,.34); text-align: center; }
+  .board-stats dt { color: var(--text-muted); font-size: .68rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+  .board-stats dd { margin: .12rem 0 0; color: var(--text-main); font-family: 'Baloo 2', 'Nunito', sans-serif; font-size: 1.05rem; font-weight: 1000; line-height: 1.05; }
+
+  .garden-layout { display: grid; grid-template-columns: minmax(210px, .34fr) minmax(0, 1fr); gap: clamp(1rem, 2vw, 1.7rem); align-items: start; }
+  .garden-sidebar { position: sticky; top: 118px; display: grid; gap: .86rem; }
+  .sidebar-card { padding: 1rem; background: rgba(255,253,245,.9); }
+  :root[data-theme='dark'] .sidebar-card { background: rgba(12,12,12,.82); }
+  .sidebar-label { display: block; color: var(--color-caramel); font-size: .72rem; font-weight: 950; letter-spacing: .16em; text-transform: uppercase; }
+  .category-nav, .tag-cloud { display: flex; flex-wrap: wrap; gap: .55rem; margin-top: .9rem; }
+  .category-nav a, .tag-cloud span { display: inline-flex; padding: .36rem .7rem; border-radius: var(--radius-pill); background: rgba(255,232,163,.58); color: var(--text-main); font-size: .88rem; font-weight: 900; }
+  .tag-cloud span { background: rgba(207,232,184,.55); transform: rotate(-2deg); }
+  .tag-cloud .tag-strong { background: rgba(255,214,223,.6); transform: rotate(2deg); }
+  .status-card dl, .series-list { display: grid; gap: .82rem; margin: 1rem 0 0; padding: 0; }
+  .status-card div { display: flex; justify-content: space-between; gap: .8rem; padding-bottom: .65rem; border-bottom: 1px dashed rgba(138,106,63,.22); }
+  .status-card dt, .series-list span { color: var(--text-muted); }
+  .status-card dd { margin: 0; font-weight: 950; text-align: right; }
+  .series-list { list-style: none; }
+  .series-list li { padding-left: .9rem; border-left: 3px solid rgba(247,201,72,.62); }
+  .series-list strong { display: block; }
+  .series-list span { display: block; font-size: .9rem; margin-top: .15rem; }
+
+  .article-stream { display: grid; gap: clamp(1rem, 1.8vw, 1.35rem); }
+  .garden-article { display: grid; grid-template-columns: 118px minmax(0, 1fr); gap: clamp(.85rem, 1.6vw, 1.2rem); min-height: 168px; padding: .72rem; color: var(--text-main); background: rgba(255,253,245,.9); }
+  :root[data-theme='dark'] .garden-article { background: rgba(12,12,12,.82); }
+  .garden-article:hover { transform: translateY(-5px); box-shadow: var(--shadow-lift); }
+  .article-cover { position: relative; display: grid; align-content: space-between; min-height: 100%; padding: .75rem; border-radius: calc(var(--radius-lg) + 2px); overflow: hidden; background: rgba(255,232,163,.42); }
+  .article-cover img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(.9) contrast(.96); transform: scale(1.02); }
+  .article-cover::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,253,245,.32), rgba(90,65,31,.2)); z-index: 1; }
+  .article-cover::after { content: ''; position: absolute; inset: 18% auto auto 38%; width: 160px; height: 160px; border-radius: 50%; background: rgba(255,255,255,.24); filter: blur(1px); z-index: 1; }
+  .article-cover span, .article-cover i { position: relative; z-index: 2; font-weight: 950; color: #fffdf5; text-shadow: 0 2px 12px rgba(90,65,31,.38); }
+  .article-cover span { font-size: .76rem; line-height: 1.2; }
+  .article-cover i { justify-self: end; align-self: end; font-family: 'Baloo 2', var(--font-display, system-ui), sans-serif; font-size: clamp(1.9rem, 3.2vw, 3rem); line-height: .85; font-style: normal; opacity: .36; }
+  .cover-honey { background: linear-gradient(145deg, rgba(255,232,163,.95), rgba(255,250,240,.55)); }
+  .cover-grass { background: linear-gradient(145deg, rgba(207,232,184,.9), rgba(255,250,240,.55)); }
+  .cover-sky { background: linear-gradient(145deg, rgba(205,239,255,.85), rgba(255,250,240,.55)); }
+  .cover-pink { background: linear-gradient(145deg, rgba(255,214,223,.85), rgba(255,250,240,.55)); }
+  .article-body { display: flex; flex-direction: column; justify-content: center; padding: .2rem .25rem; }
+  .article-topline { display: flex; flex-wrap: wrap; gap: .38rem .58rem; color: var(--text-muted); font-size: .78rem; font-weight: 900; }
+  .article-topline span,
+  .article-topline time { padding: .18rem .48rem; border-radius: var(--radius-pill); background: rgba(255,232,163,.24); }
+  :root[data-theme='dark'] .article-topline span,
+  :root[data-theme='dark'] .article-topline time { background: rgba(255,255,255,.1); }
+  .garden-article h2 { max-width: 620px; margin: .52rem 0 .34rem; font-size: clamp(1.12rem, 1.55vw, 1.5rem); line-height: 1.18; letter-spacing: -.025em; }
+  .garden-article p { max-width: 620px; margin: 0; color: var(--text-muted); font-size: .9rem; line-height: 1.65; }
+  .article-bottomline { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-top: .85rem; }
+  .article-tags { display: flex; flex-wrap: wrap; gap: .4rem; }
+  .article-tags span { padding: .24rem .54rem; border-radius: var(--radius-pill); background: rgba(247,201,72,.16); color: var(--color-caramel); font-size: .78rem; font-weight: 900; }
+  .read-link { color: var(--text-main); font-size: .84rem; font-weight: 950; white-space: nowrap; }
+
+  @media (max-width: 940px) { .tech-info-board { grid-template-columns: 1fr; } .board-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .garden-layout, .garden-article { grid-template-columns: 1fr; } .garden-sidebar { position: static; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); } .article-cover { min-height: 140px; } }
+  @media (max-width: 560px) { .tech-shell { width: calc(100% - 24px); } .garden-article { min-height: auto; } .article-bottomline { display: grid; justify-items: start; } }
+</style>

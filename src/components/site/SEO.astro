@@ -1,0 +1,25 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+  image?: string;
+  type?: 'website' | 'article';
+}
+
+const {
+  title,
+  description = '一个软萌治愈风的个人博客，慢慢写代码，也慢慢记录生活。',
+  image = '/images/covers/default-post-cover.png',
+  type = 'website'
+} = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site || 'https://example.com').toString();
+---
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content={type} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={image} />
+<meta name="twitter:card" content="summary_large_image" />

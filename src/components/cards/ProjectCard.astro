@@ -1,0 +1,19 @@
+---
+export interface Props { title: string; description: string; techStack?: string[]; status?: string; href?: string; }
+const { title, description, techStack = [], status = 'done', href } = Astro.props;
+const cardHref = href || '/projects/';
+const statusLabel = { idea: '刚冒泡的小点子', building: '正在慢慢搭', done: '已经完成啦', archived: '放进旧盒子里' }[status] || status;
+---
+<a class="project-card soft-card reveal-on-scroll" href={cardHref}>
+  <span class="status">{statusLabel}</span>
+  <h3>{title}</h3>
+  <p>{description}</p>
+  <div class="stack">{techStack.map((item) => <span>{item}</span>)}</div>
+</a>
+<style>
+  .project-card { display: block; padding: 1.3rem; min-height: 220px; }
+  .status { color: var(--color-caramel); font-weight: 900; }
+  h3 { margin: .7rem 0 .4rem; } p { color: var(--text-muted); }
+  .stack { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: 1rem; }
+  .stack span { padding: .22rem .55rem; border-radius: var(--radius-pill); background: rgba(207,232,184,.52); font-size: .82rem; font-weight: 800; }
+</style>

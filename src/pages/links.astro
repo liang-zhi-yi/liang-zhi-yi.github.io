@@ -1,0 +1,324 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const friends = [
+  {
+    title: 'Rhine',
+    description: '保持热爱，奔赴山海',
+    href: 'https://rhine.bbroot.com/',
+    owner: 'Rhine',
+    group: '朋友博客',
+    logo: 'https://img.001315.xyz/file/tg/1778406722917.webp',
+    initials: 'RH',
+    status: '常来拜访',
+    tags: ['博客', '生活']
+  }
+];
+
+const groups = [...new Set(friends.map((friend) => friend.group))];
+const tagCount = new Set(friends.flatMap((friend) => friend.tags)).size;
+const slugify = (value: string) => encodeURIComponent(value.trim().toLowerCase().replace(/\s+/g, '-'));
+const groupAnchor = (group: string) => `group-${slugify(group)}`;
+const groupTitleId = (group: string) => `title-${slugify(group)}`;
+---
+<BaseLayout title="Friends Links | 小羊草地" description="存放其他好友博客界面的友链入口。">
+  <main class="links-shell links-page">
+    <header class="links-hero reveal-on-scroll">
+      <div>
+        <span class="sticker-tag">Friends Links</span>
+        <h1>友链入口</h1>
+      </div>
+      <p>好友博客与灵感站点。</p>
+    </header>
+
+    <section class="friends-info-board soft-card reveal-on-scroll" aria-label="友链信息看板">
+      <div class="info-copy">
+        <span>Blogroll Index</span>
+        <strong>{friends.length} 个好友博客</strong>
+      </div>
+      <dl class="info-stats">
+        <div><dt>Friends</dt><dd>{friends.length}</dd></div>
+        <div><dt>Groups</dt><dd>{groups.length}</dd></div>
+        <div><dt>Tags</dt><dd>{tagCount}</dd></div>
+        <div><dt>Mode</dt><dd>Blogroll</dd></div>
+      </dl>
+    </section>
+
+    <nav class="friend-tabs reveal-on-scroll" aria-label="友链分组导航">
+      {groups.map((group) => <a href={`#${groupAnchor(group)}`}>{group}</a>)}
+    </nav>
+
+    <section class="friend-directory" aria-label="好友博客列表">
+      {groups.map((group) => (
+        <section id={groupAnchor(group)} class="group-section reveal-on-scroll" aria-labelledby={groupTitleId(group)}>
+          <div class="group-title">
+            <span>{group}</span>
+            <h2 id={groupTitleId(group)}>{group}</h2>
+          </div>
+          <div class="friend-grid">
+            {friends.filter((friend) => friend.group === group).map((friend, index) => (
+              <article class="friend-card soft-card">
+                <div class={`avatar avatar-${index % 4}`} aria-hidden="true">
+                  {friend.logo ? (
+                    <img src={friend.logo} alt={friend.title} class="avatar-img" />
+                  ) : (
+                    friend.initials
+                  )}
+                </div>
+                <div class="friend-body">
+                  <span class="owner">@{friend.owner}</span>
+                  <h3>{friend.title}</h3>
+                  <p>{friend.description}</p>
+                  <div class="friend-tags" aria-label="友链标签">
+                    {friend.tags.map((tag) => <span>#{tag}</span>)}
+                  </div>
+                </div>
+                <span class="status-pill">{friend.status}</span>
+                <a class="visit-link" href={friend.href} target="_blank" rel="noreferrer" aria-label={`拜访 ${friend.title}`}>
+                  ↗
+                </a>
+              </article>
+            ))}
+          </div>
+        </section>
+      ))}
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .links-shell {
+    width: var(--page-shell-width);
+    margin-inline: auto;
+  }
+
+  .links-page { padding: 34px 0 78px; }
+
+  .links-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 340px);
+    gap: clamp(1rem, 2.6vw, 2rem);
+    align-items: end;
+    margin-bottom: 20px;
+    padding-bottom: 22px;
+    border-bottom: 1px dashed rgba(201, 139, 58, .24);
+  }
+
+  .links-hero h1 {
+    max-width: 720px;
+    margin: .85rem 0 0;
+    font-size: clamp(1.22rem, 2.1vw, 2.2rem);
+    line-height: 1.14;
+    letter-spacing: -.028em;
+  }
+
+  .links-hero p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: clamp(.96rem, 1.2vw, 1.06rem);
+  }
+
+  .friends-info-board {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 16px;
+    padding: .95rem 1rem;
+    border-radius: var(--radius-xl);
+    background: rgba(255,253,245,.88);
+  }
+
+  :root[data-theme='dark'] .friends-info-board { background: rgba(12,12,12,.78); }
+
+  .info-copy { display: grid; gap: .18rem; }
+  .info-copy span,
+  .group-title span,
+  .owner {
+    color: var(--color-caramel);
+    font-size: .72rem;
+    font-weight: 950;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+  .info-copy strong { color: var(--text-main); font-size: clamp(1.05rem, 1.5vw, 1.32rem); line-height: 1.18; }
+  .info-copy p { margin: 0; color: var(--text-muted); font-size: .92rem; }
+
+  .info-stats { display: grid; grid-template-columns: repeat(4, minmax(62px, 1fr)); gap: .5rem; margin: 0; }
+  .info-stats div { padding: .55rem .65rem; border-radius: 18px; background: rgba(255,232,163,.34); text-align: center; }
+  .info-stats dt { color: var(--text-muted); font-size: .68rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+  .info-stats dd { margin: .12rem 0 0; color: var(--text-main); font-family: 'Baloo 2', 'Nunito', sans-serif; font-size: 1rem; font-weight: 1000; line-height: 1.05; }
+
+  .link-notice {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: .8rem;
+    align-items: center;
+    margin-bottom: 14px;
+    padding: .75rem .9rem;
+    border: 1px dashed rgba(201, 139, 58, .26);
+    border-radius: 22px;
+    background: rgba(255,253,245,.62);
+    color: var(--text-muted);
+  }
+  :root[data-theme='dark'] .link-notice { background: rgba(12,12,12,.62); }
+  .link-notice strong { color: var(--text-main); white-space: nowrap; }
+  .link-notice p { margin: 0; font-size: .92rem; }
+
+  .friend-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .55rem;
+    margin: 0 0 22px;
+  }
+  .friend-tabs a {
+    display: inline-flex;
+    padding: .42rem .8rem;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-pill);
+    background: rgba(255,232,163,.34);
+    color: var(--text-main);
+    font-size: .9rem;
+    font-weight: 900;
+  }
+
+  .friend-directory,
+  .group-section { display: grid; gap: 16px; }
+
+  .group-section {
+    padding: 1rem;
+    border: 1px solid var(--border-soft);
+    border-radius: 30px;
+    background: rgba(255,253,245,.56);
+  }
+  :root[data-theme='dark'] .group-section { background: rgba(12,12,12,.62); }
+
+  .group-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 14px;
+  }
+
+  .group-title h2 {
+    margin: 0;
+    font-size: clamp(1.28rem, 2vw, 1.9rem);
+    line-height: 1.12;
+    letter-spacing: -.03em;
+  }
+
+  .friend-grid {
+    display: grid;
+    gap: 10px;
+  }
+
+  .friend-card {
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr) auto auto;
+    gap: .85rem;
+    align-items: center;
+    min-height: 0;
+    padding: .82rem .9rem;
+    color: inherit;
+    border-radius: 22px;
+    background: rgba(255,253,245,.9);
+  }
+
+  :root[data-theme='dark'] .friend-card { background: rgba(12,12,12,.82); }
+  .friend-card:hover { transform: translateX(4px); box-shadow: var(--shadow-lift); }
+
+  .friend-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .avatar {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 20px 24px 18px 24px;
+    background: var(--color-butter);
+    color: #5a411f;
+    box-shadow: var(--shadow-card);
+    font-family: 'Baloo 2', 'Nunito', sans-serif;
+    font-size: 1.28rem;
+    font-weight: 950;
+    overflow: hidden;
+  }
+  .avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+  }
+  .avatar-1 { background: var(--color-grass-soft); }
+  .avatar-2 { background: var(--color-sky-soft); }
+  .avatar-3 { background: var(--color-pink-soft); }
+
+  .status-pill {
+    padding: .28rem .7rem;
+    border-radius: var(--radius-pill);
+    background: rgba(207, 232, 184, .42);
+    color: var(--text-muted);
+    font-size: .82rem;
+    font-weight: 900;
+  }
+
+  .friend-body h3 {
+    margin: .18rem 0 .25rem;
+    font-size: clamp(1.02rem, 1.45vw, 1.28rem);
+    line-height: 1.14;
+    letter-spacing: -.02em;
+  }
+
+  .friend-body p {
+    margin: 0;
+    color: var(--text-muted);
+    line-height: 1.55;
+    font-size: .9rem;
+  }
+
+  .friend-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .32rem;
+    margin-top: .38rem;
+  }
+  .friend-tags span {
+    padding: .24rem .55rem;
+    border-radius: var(--radius-pill);
+    background: rgba(255,232,163,.28);
+    color: var(--color-caramel);
+    font-size: .78rem;
+    font-weight: 900;
+  }
+
+  .visit-link {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 14px;
+    background: rgba(255,232,163,.36);
+    color: var(--text-main);
+    font-size: 1rem;
+    font-weight: 950;
+  }
+
+  @media (max-width: 920px) {
+    .links-hero,
+    .friends-info-board { grid-template-columns: 1fr; }
+    .info-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  @media (max-width: 680px) {
+    .links-shell { width: calc(100% - 22px); }
+    .friend-card { grid-template-columns: 48px minmax(0, 1fr); }
+    .status-pill,
+    .visit-link { justify-self: start; }
+  }
+</style>

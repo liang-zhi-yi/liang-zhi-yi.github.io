@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import { formatDate } from '../utils/date';
 
 // 获取站点统计数据
 const [blogPosts, lifeEntries, projects, collections] = await Promise.all([
@@ -32,17 +33,11 @@ const allDates = [
   ...blogPosts.map(p => p.data.pubDate),
   ...lifeEntries.map(e => e.data.pubDate),
   ...projects.map(p => p.data.pubDate),
-  ...collections.map(c => c.data.pubDate || new Date('2026-01-01'))
+  ...collections.map(c => c.data.pubDate || new Date('2026-05-27'))
 ];
 const latestUpdate = allDates.length > 0 ? new Date(Math.max(...allDates.map(d => d.getTime()))) : new Date();
 
-const formatDate = (date: Date) => {
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  });
-};
+
 ---
 <BaseLayout title="About Me | 小羊草地" description="个人信息与自我简介。">
   <main class="about-shell">
@@ -106,12 +101,12 @@ const formatDate = (date: Date) => {
             <span class="stat-value">{formatNumber(totalWordCount)}</span>
           </div>
           <div class="stat-item">
-            <span class="stat-label">总浏览量</span>
-            <span class="stat-value">1.2万</span>
+            <span class="stat-label">文章数</span>
+            <span class="stat-value">{blogPosts.length}</span>
           </div>
           <div class="stat-item">
-            <span class="stat-label">总访客量</span>
-            <span class="stat-value">3.8千</span>
+            <span class="stat-label">生活记录</span>
+            <span class="stat-value">{lifeEntries.length}</span>
           </div>
           <div class="stat-item">
             <span class="stat-label">最新更新</span>

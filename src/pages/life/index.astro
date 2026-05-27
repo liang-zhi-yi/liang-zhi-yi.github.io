@@ -1,0 +1,302 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate } from '../../utils/date';
+
+const lifeEntries = (await getCollection('life', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+
+const moods = Array.from(new Set(lifeEntries.map((entry) => entry.data.mood).filter(Boolean)));
+const latestLife = lifeEntries[0]?.data.pubDate;
+const lifeHref = (id: string) => `/life/${id.replace(/\.(md|mdx)$/, '')}/`;
+const weatherList = ['晴 / Sunlit', '多云 / Cloudy', '微风 / Breeze', '午后光 / Warm light'];
+const photoTones = ['photo-peach', 'photo-sky', 'photo-grass', 'photo-honey'];
+const imageModules = import.meta.glob('../../../image/*.{png,jpg,jpeg,webp}', { eager: true, query: '?url', import: 'default' });
+const imagePool = Object.values(imageModules) as string[];
+const lifeImage = (index: number) => imagePool[(index + 2) % imagePool.length] || '';
+---
+<BaseLayout title="Life Records | 小羊草地" description="用时间轴、手帐贴纸和情绪流式阅读体验记录日常、心情和慢下来的小片段。">
+  <main class="life-page">
+    <div class="life-shell">
+      <section class="journal-hero reveal-on-scroll" aria-labelledby="life-title">
+        <div>
+          <span class="sticker-tag">Life Records</span>
+          <h1 id="life-title">生活记录</h1>
+          <p>日常、天气、心情。</p>
+        </div>
+        <aside class="mood-board soft-card" aria-label="今日心情指数" data-mood-board>
+          <span class="mood-title">TODAY MOOD</span>
+          <i class="mood-label">暖乎乎</i>
+          <div class="mood-cloud" aria-label="心情指数 0 到 100">
+            <span class="mood-cloud-fill" data-mood-fill></span>
+            <b data-mood-score>--</b>
+          </div>
+          <p class="mood-level" data-mood-level>正在晒太阳</p>
+          <p class="mood-note" data-mood-note>和小羊一起发呆</p>
+        </aside>
+      </section>
+
+      <section class="life-info-board reveal-on-scroll" aria-label="生活记录信息看板">
+        <div class="board-copy">
+          <span>Life Index</span>
+          <strong>{lifeEntries.length} 条生活记录</strong>
+        </div>
+        <dl class="board-stats">
+          <div><dt>Records</dt><dd>{lifeEntries.length}</dd></div>
+          <div><dt>Moods</dt><dd>{moods.length || 1}</dd></div>
+          <div><dt>Mode</dt><dd>Timeline</dd></div>
+          <div><dt>Latest</dt><dd>{latestLife ? formatDate(latestLife) : '等待'}</dd></div>
+        </dl>
+      </section>
+
+      <section class="journal-timeline" aria-label="左右交错生活时间轴">
+        {lifeEntries.map((entry, index) => {
+          const side = index % 2 === 0 ? 'left' : 'right';
+          const weather = weatherList[index % weatherList.length];
+          const photoTone = photoTones[index % photoTones.length];
+          return (
+            <article class={`diary-entry ${side} reveal-on-scroll`}>
+              <div class="date-node" aria-hidden="true">
+                <span>{String(index + 1).padStart(2, '0')}</span>
+              </div>
+              <a class="diary-card soft-card" href={lifeHref(entry.id)}>
+                <div class={`mini-photo ${photoTone}`} aria-hidden="true">
+                  {lifeImage(index) && <img src={lifeImage(index)} alt="" loading="lazy" />}
+                  <span>{entry.data.mood || 'daily'}</span>
+                </div>
+                <div class="diary-copy">
+                  <div class="diary-meta">
+                    <time datetime={entry.data.pubDate.toISOString()}>{formatDate(entry.data.pubDate)}</time>
+                    <span>{weather}</span>
+                  </div>
+                  <h2>{entry.data.title}</h2>
+                  {entry.data.description && <p>{entry.data.description}</p>}
+                  <div class="sticker-row">
+                    <span>{entry.data.mood || '慢慢来'}</span>
+                    <span>handbook note</span>
+                  </div>
+                </div>
+              </a>
+            </article>
+          );
+        })}
+      </section>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .life-page { padding: clamp(30px, 5vw, 58px) 0 86px; }
+  .life-shell { width: var(--page-shell-width); margin-inline: auto; }
+  .journal-hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 300px); gap: clamp(1rem, 2.4vw, 1.8rem); align-items: center; margin-bottom: clamp(1.6rem, 3.6vw, 3rem); }
+  .journal-hero h1 { max-width: 760px; margin: .85rem 0 .75rem; font-size: clamp(1.3rem, 2.4vw, 2.5rem); line-height: 1.12; letter-spacing: -.03em; }
+  .journal-hero p { max-width: 620px; margin: 0; color: var(--text-muted); font-size: clamp(.96rem, 1.2vw, 1.06rem); }
+  .mood-board {
+    --mood-fill: 72%;
+    --mood-gradient: linear-gradient(90deg, #ffe8a3, #ffd6df);
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: .52rem .75rem;
+    align-items: center;
+    padding: .82rem .9rem;
+    border: 1px solid rgba(255,255,255,.38);
+    border-radius: 26px;
+    background:
+      radial-gradient(circle at 88% 18%, rgba(255,232,163,.18), transparent 7rem),
+      rgba(255,253,245,.38);
+    box-shadow: 0 14px 34px rgba(95,75,50,.08);
+    backdrop-filter: blur(18px) saturate(128%);
+    animation: mood-card-in .22s var(--ease-soft) both;
+  }
+  :root[data-theme='dark'] .mood-board {
+    border-color: rgba(255,224,138,.16);
+    background:
+      radial-gradient(circle at 88% 18%, rgba(255,224,138,.1), transparent 7rem),
+      rgba(8,8,8,.34);
+    box-shadow: 0 14px 34px rgba(0,0,0,.2);
+  }
+  .mood-board::before { opacity: .32; }
+  :root[data-theme='dark'] .mood-board::before { opacity: .16; }
+  .mood-board:hover { transform: translateY(-2px); box-shadow: 0 18px 38px rgba(95,75,50,.12); }
+  .mood-title {
+    color: #9b6122;
+    font-family: 'Nunito', 'LXGW WenKai Screen', 'Noto Sans SC', sans-serif;
+    font-size: .76rem;
+    font-weight: 800;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+  }
+  :root[data-theme='dark'] .mood-title { color: #f0cf82; }
+  .mood-label {
+    display: inline-flex;
+    justify-self: end;
+    padding: .28rem .68rem;
+    border-radius: var(--radius-pill);
+    background: rgba(255,232,163,.48);
+    color: #5a411f;
+    font-style: normal;
+    font-weight: 950;
+    line-height: 1.1;
+    box-shadow: inset 0 -2px 0 rgba(201,139,58,.08);
+  }
+  .mood-cloud {
+    position: relative;
+    grid-column: 1 / -1;
+    width: 100%;
+    height: 38px;
+    margin-top: .02rem;
+    overflow: hidden;
+    border: 1px solid rgba(201,139,58,.1);
+    border-radius: 999px;
+    background:
+      linear-gradient(90deg, rgba(255,253,245,.34), rgba(255,232,163,.12));
+    box-shadow: inset 0 0 14px rgba(255,255,255,.22);
+  }
+  :root[data-theme='dark'] .mood-cloud {
+    border-color: rgba(255,224,138,.12);
+    background: linear-gradient(90deg, rgba(255,255,255,.07), rgba(255,224,138,.06));
+    box-shadow: inset 0 0 14px rgba(255,224,138,.06);
+  }
+  .mood-cloud::before,
+  .mood-cloud::after {
+    content: '';
+    position: absolute;
+    inset: 5px 8px;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  .mood-cloud::before { box-shadow: inset 0 0 12px rgba(255,255,255,.14); filter: blur(.4px); }
+  .mood-cloud::after { background-image: radial-gradient(circle, rgba(255,255,255,.24) 0 1px, transparent 1.5px); background-size: 14px 12px; opacity: .22; }
+  .mood-cloud-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0%;
+    border-radius: inherit;
+    background: var(--mood-gradient);
+    filter: saturate(1.03) blur(.15px);
+    box-shadow: 10px 0 22px rgba(255,214,223,.26);
+    transition: width .3s var(--ease-soft), background .25s ease;
+  }
+  .mood-cloud b {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: #5a411f;
+    font-family: 'Baloo 2', 'Nunito', sans-serif;
+    font-size: .92rem;
+    font-weight: 900;
+    letter-spacing: .02em;
+  }
+  .mood-level,
+  .mood-note { margin: 0; }
+  .mood-level { color: var(--text-main); font-size: .88rem; font-weight: 900; }
+  .mood-note { grid-column: 1 / -1; color: var(--text-muted); font-size: .82rem; line-height: 1.48; }
+
+  @keyframes mood-card-in {
+    from { opacity: 0; transform: translateX(18px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .sticker-row span { display: inline-flex; padding: .38rem .75rem; border-radius: var(--radius-pill); background: rgba(255,232,163,.64); color: var(--text-main); font-style: normal; font-weight: 900; transform: rotate(-3deg); }
+  .sticker-row span:nth-child(even) { background: rgba(207,232,184,.58); transform: rotate(2deg); }
+
+  .life-info-board {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: center;
+    margin: 0 0 clamp(1.2rem, 2.6vw, 2rem);
+    padding: .95rem 1rem;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-xl);
+    background: rgba(255,253,245,.88);
+    box-shadow: var(--shadow-card);
+    backdrop-filter: blur(14px) saturate(126%);
+  }
+  :root[data-theme='dark'] .life-info-board { background: rgba(12,12,12,.78); }
+  .board-copy { display: grid; gap: .18rem; }
+  .board-copy span { color: var(--color-caramel); font-size: .72rem; font-weight: 950; letter-spacing: .16em; text-transform: uppercase; }
+  .board-copy strong { color: var(--text-main); font-size: clamp(1.05rem, 1.5vw, 1.32rem); line-height: 1.18; }
+  .board-copy p { margin: 0; color: var(--text-muted); font-size: .92rem; }
+  .board-stats { display: grid; grid-template-columns: repeat(4, minmax(62px, 1fr)); gap: .5rem; margin: 0; }
+  .board-stats div { padding: .55rem .65rem; border-radius: 18px; background: rgba(255,232,163,.34); text-align: center; }
+  .board-stats dt { color: var(--text-muted); font-size: .68rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+  .board-stats dd { margin: .12rem 0 0; color: var(--text-main); font-family: 'Baloo 2', 'Nunito', sans-serif; font-size: 1rem; font-weight: 1000; line-height: 1.05; }
+
+  .journal-timeline { position: relative; display: grid; gap: clamp(1.3rem, 3vw, 2.2rem); }
+  .journal-timeline::before { content: ''; position: absolute; inset: 0 auto 0 50%; width: 3px; transform: translateX(-50%); border-radius: 99px; background: linear-gradient(180deg, rgba(255,214,223,.9), rgba(247,201,72,.75), rgba(207,232,184,.9)); }
+  .diary-entry { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 72px minmax(0, 1fr); align-items: center; }
+  .diary-entry.left .diary-card { grid-column: 1; }
+  .diary-entry.right .diary-card { grid-column: 3; }
+  .date-node { position: relative; z-index: 2; grid-column: 2; justify-self: center; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 20px; background: rgba(255,250,240,.85); border: 1px solid rgba(255,255,255,.75); box-shadow: 0 12px 28px rgba(95,75,50,.12); color: var(--color-caramel); font-weight: 950; }
+  .diary-card { display: grid; grid-template-columns: minmax(100px, 140px) minmax(0, 1fr); gap: .9rem; min-height: 200px; padding: .82rem; color: var(--text-main); background: rgba(255,253,245,.9); transform: rotate(var(--tilt, -1deg)); }
+  :root[data-theme='dark'] .diary-card { background: rgba(12,12,12,.82); }
+  .diary-entry.right .diary-card { --tilt: 1deg; }
+  .diary-card:hover { transform: rotate(0deg) translateY(-5px); box-shadow: var(--shadow-lift); }
+  .mini-photo { position: relative; min-height: 100%; border-radius: calc(var(--radius-lg) + 2px); display: grid; place-items: end start; padding: .9rem; overflow: hidden; background: rgba(255,232,163,.38); }
+  .mini-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(.92) contrast(.96); transform: scale(1.03); }
+  .mini-photo::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,253,245,.18), rgba(90,65,31,.22)); }
+  .mini-photo span { position: relative; z-index: 1; color: #fffdf5; font-weight: 950; text-shadow: 0 2px 12px rgba(90,65,31,.38); }
+  .photo-peach { background: radial-gradient(circle at 70% 24%, rgba(255,255,255,.52), transparent 5rem), linear-gradient(145deg, rgba(255,214,223,.78), rgba(255,250,240,.55)); }
+  .photo-sky { background: radial-gradient(circle at 70% 24%, rgba(255,255,255,.52), transparent 5rem), linear-gradient(145deg, rgba(205,239,255,.78), rgba(255,250,240,.55)); }
+  .photo-grass { background: radial-gradient(circle at 70% 24%, rgba(255,255,255,.52), transparent 5rem), linear-gradient(145deg, rgba(207,232,184,.82), rgba(255,250,240,.55)); }
+  .photo-honey { background: radial-gradient(circle at 70% 24%, rgba(255,255,255,.52), transparent 5rem), linear-gradient(145deg, rgba(255,232,163,.86), rgba(255,250,240,.55)); }
+  .diary-copy { display: flex; flex-direction: column; justify-content: center; }
+  .diary-meta { display: flex; flex-wrap: wrap; gap: .5rem .85rem; color: var(--text-muted); font-size: .88rem; font-weight: 900; }
+  .diary-card h2 { margin: .52rem 0 .38rem; font-size: clamp(1.18rem, 1.8vw, 1.7rem); line-height: 1.16; letter-spacing: -.035em; }
+  .diary-card p { margin: 0; color: var(--text-muted); line-height: 1.72; }
+  .sticker-row { display: flex; flex-wrap: wrap; gap: .52rem; margin-top: 1rem; }
+  .sticker-row span { font-size: .84rem; }
+
+  @media (max-width: 920px) { .journal-hero, .life-info-board, .diary-entry, .diary-card { grid-template-columns: 1fr; } .board-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .journal-timeline::before { left: 28px; transform: none; } .date-node { grid-column: 1; justify-self: start; margin-left: 0; } .diary-entry.left .diary-card, .diary-entry.right .diary-card { grid-column: 1; } }
+  @media (max-width: 560px) { .life-shell { width: calc(100% - 24px); } .diary-card { min-height: auto; } .mini-photo { min-height: 150px; } }
+</style>
+
+<script is:inline>
+  (() => {
+    const board = document.querySelector('[data-mood-board]');
+    if (!board) return;
+
+    const todayKey = new Date().toISOString().slice(0, 10);
+    const storageKey = `soft-sheep-mood-${todayKey}`;
+    const notes = ['被阳光晒软的一天', '和小羊一起发呆', '把烦恼揉成小云朵', '慢慢喝完一杯热茶', '今天也有一点点闪光', '适合躲进奶黄色被窝'];
+    const levels = [
+      { max: 20, text: '轻轻休息', gradient: 'linear-gradient(90deg, #d9e2dc, #f6dfd9)' },
+      { max: 40, text: '慢慢回暖', gradient: 'linear-gradient(90deg, #cfe8b8, #fff2bd)' },
+      { max: 60, text: '暖乎乎路过', gradient: 'linear-gradient(90deg, #ffe8a3, #ffd6df)' },
+      { max: 80, text: '晒到太阳了', gradient: 'linear-gradient(90deg, #ffd978, #ffb9c8)' },
+      { max: 100, text: '小羊蓬松满格', gradient: 'linear-gradient(90deg, #f7c948, #ffadbd)' }
+    ];
+
+    const readCache = () => {
+      try { return JSON.parse(localStorage.getItem(storageKey) || 'null'); }
+      catch { return null; }
+    };
+    const pick = () => {
+      const cached = readCache();
+      if (cached && Number.isFinite(cached.score) && cached.note) return cached;
+      const score = Math.floor(Math.random() * 101);
+      const note = notes[Math.floor(Math.random() * notes.length)];
+      const value = { score, note };
+      localStorage.setItem(storageKey, JSON.stringify(value));
+      return value;
+    };
+
+    const { score, note } = pick();
+    const level = levels.find((item) => score <= item.max) || levels[levels.length - 1];
+    const fill = board.querySelector('[data-mood-fill]');
+    const scoreEl = board.querySelector('[data-mood-score]');
+    const levelEl = board.querySelector('[data-mood-level]');
+    const noteEl = board.querySelector('[data-mood-note]');
+
+    board.style.setProperty('--mood-gradient', level.gradient);
+    if (scoreEl) scoreEl.textContent = `${score}/100`;
+    if (levelEl) levelEl.textContent = level.text;
+    if (noteEl) noteEl.textContent = note;
+    requestAnimationFrame(() => {
+      if (fill) fill.style.width = `${score}%`;
+    });
+  })();
+</script>

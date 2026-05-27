@@ -1,0 +1,21 @@
+---
+import { getCollection, render } from 'astro:content';
+import PostLayout from '../../layouts/PostLayout.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('life', ({ data }) => !data.draft);
+  return entries.map((entry) => ({ params: { slug: entry.id.replace(/\.(md|mdx)$/, '') }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+<PostLayout
+  title={entry.data.title}
+  description={entry.data.description || '一篇来自小羊草地的生活记录。'}
+  pubDate={entry.data.pubDate}
+  tags={entry.data.tags}
+  cover={entry.data.cover}
+>
+  <Content />
+</PostLayout>

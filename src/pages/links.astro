@@ -8,7 +8,7 @@ const friends = [
     href: 'https://rhine.bbroot.com/',
     owner: 'Rhine',
     group: '朋友博客',
-    logo: 'https://img.001315.xyz/file/tg/1778406722917.webp',
+    logo: '/images/friends/rhine-avatar.webp',
     initials: 'RH',
     status: '常来拜访',
     tags: ['博客', '生活']
@@ -52,7 +52,7 @@ const groupTitleId = (group: string) => `title-${slugify(group)}`;
       {groups.map((group) => (
         <section id={groupAnchor(group)} class="group-section reveal-on-scroll" aria-labelledby={groupTitleId(group)}>
           <div class="group-title">
-            <span>{group}</span>
+            <span aria-hidden="true">{group}</span>
             <h2 id={groupTitleId(group)}>{group}</h2>
           </div>
           <div class="friend-grid">

@@ -9,10 +9,11 @@ export interface Props {
 const {
   title,
   description = '一个软萌治愈风的个人博客，慢慢写代码，也慢慢记录生活。',
-  image = '/images/covers/default-post-cover.png',
+  image = '/images/covers/default-post-cover.svg',
   type = 'website'
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site || 'https://example.com').toString();
+const imageUrl = image?.startsWith('http') ? image : new URL(image, Astro.site || 'https://example.com').toString();
 ---
 <title>{title}</title>
 <meta name="description" content={description} />
@@ -21,5 +22,5 @@ const canonical = new URL(Astro.url.pathname, Astro.site || 'https://example.com
 <meta property="og:description" content={description} />
 <meta property="og:type" content={type} />
 <meta property="og:url" content={canonical} />
-<meta property="og:image" content={image} />
+<meta property="og:image" content={imageUrl} />
 <meta name="twitter:card" content="summary_large_image" />

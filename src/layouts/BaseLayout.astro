@@ -43,7 +43,9 @@ const { title, description, image, type = 'website' } = Astro.props;
     <ThemeToggle />
     <BackToTop />
     <canvas id="cursor-trail" aria-hidden="true"></canvas>
-    <script type="module" src="/src/scripts/site.ts"></script>
+    <script>
+      import '../scripts/site.ts';
+    </script>
     <script is:inline>
       (() => {
         if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;

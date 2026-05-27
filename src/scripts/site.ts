@@ -168,13 +168,8 @@ function initPageShutter() {
     event.preventDefault();
     root.classList.add('is-shuttering');
     
-    // 超时回退机制：如果转场动画后页面未跳转，强制跳转
-    const navigationTimeout = window.setTimeout(() => {
-      window.location.href = url.href;
-    }, 500);
-    
+    // 页面转场动画后跳转
     window.setTimeout(() => {
-      window.clearTimeout(navigationTimeout);
       window.location.href = url.href;
     }, 170);
   });

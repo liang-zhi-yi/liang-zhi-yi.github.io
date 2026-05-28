@@ -194,12 +194,13 @@
     .toc {
       display: block;
       position: fixed;
-      top: 108px;
-      bottom: 12px;
-      right: max(22px, calc((100vw - 980px) / 2 - 250px));
+      top: var(--post-side-top, 128px);
+      bottom: var(--post-side-bottom, 28px);
+      right: max(22px, calc((100vw - min(calc(var(--post-content-width, 760px) + var(--post-toc-width, 248px) + var(--post-toc-gap, 32px)), calc(100vw - 44px))) / 2));
       z-index: 55;
-      width: clamp(190px, 16vw, 236px);
-      max-height: min(68vh, calc(100vh - 172px));
+      width: var(--post-toc-width, clamp(204px, 16vw, 248px));
+      height: calc(100vh - var(--post-side-top, 128px) - var(--post-side-bottom, 28px));
+      max-height: none;
       background:
         linear-gradient(180deg, rgba(255, 253, 245, .9), rgba(255, 245, 207, .82));
       border-color: rgba(247, 201, 72, .32);
@@ -254,16 +255,16 @@
 
   .toc-title {
     color: var(--text-main);
-    font-size: 0.7rem;
+    font-size: 0.66rem;
     font-weight: 950;
     line-height: 1.3;
   }
 
   .toc-progress {
     color: var(--color-caramel);
-    font-size: 0.56rem;
+    font-size: 0.52rem;
     font-weight: 850;
-    padding: .2rem .5rem;
+    padding: .16rem .44rem;
     border-radius: 999px;
     background: rgba(247, 201, 72, .15);
   }

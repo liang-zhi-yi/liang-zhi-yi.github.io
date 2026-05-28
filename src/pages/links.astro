@@ -60,7 +60,7 @@ const groupTitleId = (group: string) => `title-${slugify(group)}`;
               <article class="friend-card soft-card">
                 <div class={`avatar avatar-${index % 4}`} aria-hidden="true">
                   {friend.logo ? (
-                    <img src={friend.logo} alt={friend.title} class="avatar-img" />
+                    <img src={friend.logo} alt={friend.title} class="avatar-img" loading="lazy" width="52" height="52" />
                   ) : (
                     friend.initials
                   )}

@@ -42,11 +42,12 @@ const latestUpdate = allDates.length > 0 ? new Date(Math.max(...allDates.map(d =
 <BaseLayout title="About Me | 小羊草地" description="个人信息与自我简介。">
   <main class="about-shell">
     <section class="profile-card soft-card reveal-on-scroll" aria-labelledby="about-title">
+      <h1 id="about-title" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">关于我</h1>
       <!-- 左侧：头像和简介 -->
       <div class="profile-left">
         <div class="avatar-section">
           <div class="avatar-placeholder" aria-label="头像">
-            <img src="/images/avatar/profile-avatar.jpg" alt="liang-zhi-yi 的头像" loading="lazy" />
+            <img src="/images/avatar/profile-avatar.jpg" alt="liang-zhi-yi 的头像" loading="lazy" width="120" height="120" />
           </div>
           <div class="intro-section" aria-labelledby="intro-title">
             <h2 id="intro-title">自我简介</h2>
@@ -60,7 +61,7 @@ const latestUpdate = allDates.length > 0 ? new Date(Math.max(...allDates.map(d =
 
         <div class="profile-main">
           <span class="sticker-tag">About Me</span>
-          <h1 id="about-title">我的个人信息栏</h1>
+          <h2>我的个人信息栏</h2>
           <dl class="profile-list">
             <div>
               <dt aria-label="昵称">
@@ -314,7 +315,7 @@ const latestUpdate = allDates.length > 0 ? new Date(Math.max(...allDates.map(d =
     font-weight: 900;
   }
 
-  .profile-main h1 {
+  .profile-main h2 {
     margin: .6rem 0 1.15rem;
     color: #2f2b25;
     font-size: 22px;
@@ -323,7 +324,7 @@ const latestUpdate = allDates.length > 0 ? new Date(Math.max(...allDates.map(d =
     letter-spacing: -.025em;
   }
 
-  :root[data-theme='dark'] .profile-main h1 {
+  :root[data-theme='dark'] .profile-main h2 {
     color: var(--text-main);
   }
 

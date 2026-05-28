@@ -26,7 +26,6 @@ const typeLabels: Record<string, string> = {
   sport: '运动',
   tech: '技术'
 };
-const normalizedType = (type: string) => ['book', 'anime', 'game', 'tool', 'website', 'sport', 'tech'].includes(type) ? type : (type === 'music' ? 'tool' : 'tech');
 const categoryAliases: Record<string, string[]> = {
   tool: ['tool', '工具'],
   website: ['website', '网站'],
@@ -37,8 +36,8 @@ const categoryAliases: Record<string, string[]> = {
   tech: ['tech', '技术']
 };
 const normalizeLabel = (value: string) => value.trim().toLowerCase();
-const getItemCategories = (tags: string[] = []) => {
-  const values = new Set(tags.map(normalizeLabel));
+const getItemCategories = (type: string, tags: string[] = []) => {
+  const values = new Set([...tags, type].map(normalizeLabel));
   return categories
     .filter((category) => category.key !== 'all')
     .filter((category) => (categoryAliases[category.key] || [category.key]).some((alias) => values.has(normalizeLabel(alias))))
@@ -70,9 +69,9 @@ const sortedItems = [...items].sort((a, b) => withContentTime(b) - withContentTi
 
     <section class="collection-list" aria-label="收藏列表" data-collection-list>
       {sortedItems.map((item) => {
-        const type = normalizedType(item.data.type);
+        const type = item.data.type || 'other';
         const label = typeLabels[type] || type;
-        const itemCategories = getItemCategories(item.data.tags || []);
+        const itemCategories = getItemCategories(type, item.data.tags || []);
         const keywords = [item.data.title, item.data.description, label, ...(item.data.tags || [])].filter(Boolean).join(' ');
         return (
           <a
@@ -233,4 +232,14 @@ const sortedItems = [...items].sort((a, b) => withContentTime(b) - withContentTi
       if (empty) empty.hidden = visibleCount !== 0;
     };
 
-    search.addEventL
+    search.addEventListener('input', apply);
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        const filterKey = chip.dataset.filter || 'all';
+        active = filterKey;
+        chips.forEach((item) => item.setAttribute('aria-pressed', String(item.dataset.filter === filterKey)));
+        apply();
+      });
+    });
+  })();
+</script>

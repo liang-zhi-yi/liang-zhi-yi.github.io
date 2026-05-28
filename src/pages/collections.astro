@@ -16,8 +16,8 @@ const categories = [
   { key: 'tech', label: '技术' }
 ];
 const typeLabels: Record<string, string> = {
-  book: '书架',
-  anime: '番剧',
+  book: '书籍',
+  anime: '动漫',
   game: '游戏',
   tool: '工具',
   website: '网站',
@@ -27,6 +27,23 @@ const typeLabels: Record<string, string> = {
   tech: '技术'
 };
 const normalizedType = (type: string) => ['book', 'anime', 'game', 'tool', 'website', 'sport', 'tech'].includes(type) ? type : (type === 'music' ? 'tool' : 'tech');
+const categoryAliases: Record<string, string[]> = {
+  tool: ['tool', '工具'],
+  website: ['website', '网站'],
+  book: ['book', '书籍', '书架'],
+  anime: ['anime', '动漫', '番剧'],
+  sport: ['sport', '运动'],
+  game: ['game', '游戏'],
+  tech: ['tech', '技术']
+};
+const normalizeLabel = (value: string) => value.trim().toLowerCase();
+const getItemCategories = (tags: string[] = []) => {
+  const values = new Set(tags.map(normalizeLabel));
+  return categories
+    .filter((category) => category.key !== 'all')
+    .filter((category) => (categoryAliases[category.key] || [category.key]).some((alias) => values.has(normalizeLabel(alias))))
+    .map((category) => category.key);
+};
 const sortedItems = [...items].sort((a, b) => withContentTime(b) - withContentTime(a));
 ---
 <BaseLayout title="Interest & Collections | 小羊草地" description="收藏喜欢的工具、网站、书籍、动漫、运动、游戏和技术内容。">
@@ -55,12 +72,13 @@ const sortedItems = [...items].sort((a, b) => withContentTime(b) - withContentTi
       {sortedItems.map((item) => {
         const type = normalizedType(item.data.type);
         const label = typeLabels[type] || type;
+        const itemCategories = getItemCategories(item.data.tags || []);
         const keywords = [item.data.title, item.data.description, label, ...(item.data.tags || [])].filter(Boolean).join(' ');
         return (
           <a
             class="collection-row soft-card reveal-on-scroll"
             href={item.data.link || '/collections/'}
-            data-category={type}
+            data-category={itemCategories.join(' ')}
             data-keywords={keywords.toLowerCase()}
           >
             <span class={`row-type type-${type}`}>{label}</span>
@@ -204,7 +222,8 @@ const sortedItems = [...items].sort((a, b) => withContentTime(b) - withContentTi
       const query = search.value.trim().toLowerCase();
       let visibleCount = 0;
       rows.forEach((row) => {
-        const matchCategory = active === 'all' || row.dataset.category === active;
+        const rowCategories = (row.dataset.category || '').split(' ').filter(Boolean);
+        const matchCategory = active === 'all' || rowCategories.includes(active);
         const matchQuery = !query || (row.dataset.keywords || '').includes(query);
         const show = matchCategory && matchQuery;
         row.hidden = !show;

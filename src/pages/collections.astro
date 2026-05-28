@@ -168,6 +168,7 @@ const sortedItems = [...items].sort((a, b) => withContentTime(b) - withContentTi
     background: rgba(255,253,245,.88);
   }
   :root[data-theme='dark'] .collection-row { background: rgba(12,12,12,.78); }
+  .collection-row[hidden] { display: none !important; }
   .collection-row:hover { transform: translateX(4px); box-shadow: var(--shadow-lift); }
 
   .row-type {
@@ -232,13 +233,4 @@ const sortedItems = [...items].sort((a, b) => withContentTime(b) - withContentTi
       if (empty) empty.hidden = visibleCount !== 0;
     };
 
-    search.addEventListener('input', apply);
-    chips.forEach((chip) => {
-      chip.addEventListener('click', () => {
-        active = chip.dataset.filter || 'all';
-        chips.forEach((item) => item.setAttribute('aria-pressed', String(item === chip)));
-        apply();
-      });
-    });
-  })();
-</script>
+    search.addEventL
